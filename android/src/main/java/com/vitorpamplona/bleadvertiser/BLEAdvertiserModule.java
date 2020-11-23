@@ -455,7 +455,7 @@ public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
             dataBuilder.setIncludeTxPowerLevel(options.getBoolean("includeTxPowerLevel"));
         
         dataBuilder.addManufacturerData(companyId, payload);
-        dataBuilder.addServiceUuid(uuid);
+        //dataBuilder.addServiceUuid(uuid);
         return dataBuilder.build();
     }
 
