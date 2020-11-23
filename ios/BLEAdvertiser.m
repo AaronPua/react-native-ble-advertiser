@@ -33,8 +33,9 @@ RCT_EXPORT_METHOD(broadcast: (NSString *)uid payload:(NSArray *)payload options:
     //NSDictionary *advertisingData = [beaconRegion peripheralDataWithMeasuredPower:nil];
     
     NSDictionary *advertisingData = @{
-        CBAdvertisementDataManufacturerDataKey : payload,
-        CBAdvertisementDataServiceUUIDsKey : @[[CBUUID UUIDWithString:uid]]};
+        CBAdvertisementDataManufacturerDataKey : payload
+      //  CBAdvertisementDataServiceUUIDsKey : @[[CBUUID UUIDWithString:uid]]
+    };
 
     [peripheralManager startAdvertising:advertisingData];
 
