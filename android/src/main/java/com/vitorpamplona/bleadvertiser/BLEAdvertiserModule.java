@@ -430,6 +430,7 @@ public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
     private AdvertiseSettings buildAdvertiseSettings(ReadableMap options) {
         AdvertiseSettings.Builder settingsBuilder = new AdvertiseSettings.Builder();
 
+	    /*
         if (options != null && options.hasKey("advertiseMode")) {
             settingsBuilder.setAdvertiseMode(options.getInt("advertiseMode"));
         }
@@ -440,7 +441,11 @@ public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
 
         if (options != null && options.hasKey("connectable")) {
             settingsBuilder.setConnectable(options.getBoolean("connectable"));
-        }
+        }*/
+        settingsBuilder.setConnectable(false);
+        settingsBuilder.setTimeout(1000);
+        settingsBuilder.setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_HIGH);
+        settingsBuilder.setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY);
 
         return settingsBuilder.build();
     }
