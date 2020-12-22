@@ -146,11 +146,12 @@ public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
             tempAdvertiser = mAdvertiserList.remove(uid);
             tempCallback = mAdvertiserCallbackList.remove(uid);
 
-            tempAdvertiser.stopAdvertising(tempCallback);
-        } else {
-            tempAdvertiser = mBluetoothAdapter.getBluetoothLeAdvertiser();
-            tempCallback = new BLEAdvertiserModule.SimpleAdvertiseCallback(promise);
-        }
+            //tempAdvertiser.stopAdvertising(tempCallback);
+        } 
+	    
+        tempAdvertiser = mBluetoothAdapter.getBluetoothLeAdvertiser();
+        tempCallback = new BLEAdvertiserModule.SimpleAdvertiseCallback(promise);
+        
          
         if (tempAdvertiser == null) {
             Log.w("BLEAdvertiserModule", "Advertiser Not Available unavailable");
@@ -158,6 +159,8 @@ public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
             return;
         }
         
+	Log.w("BLEAdvertiserModule", "Advertisers data:" + arrToString(toByteArray(payload)));
+	    
         AdvertiseSettings settings = buildAdvertiseSettings(options);
         AdvertiseData data = buildAdvertiseData(ParcelUuid.fromString(uid), toByteArray(payload), options);
 
@@ -181,6 +184,17 @@ public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
             array.pushInt(data);
         }
         return array;
+    }
+	
+    private String arrToString(byte[] _arr)
+    {
+        String ret = "";
+
+        for (byte data : _arr) {
+            ret += String.format("%02X ", data) + " ";
+        }
+
+        return ret;
     }
 
    @ReactMethod
@@ -430,7 +444,6 @@ public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
     private AdvertiseSettings buildAdvertiseSettings(ReadableMap options) {
         AdvertiseSettings.Builder settingsBuilder = new AdvertiseSettings.Builder();
 
-	    /*
         if (options != null && options.hasKey("advertiseMode")) {
             settingsBuilder.setAdvertiseMode(options.getInt("advertiseMode"));
         }
@@ -441,11 +454,16 @@ public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
 
         if (options != null && options.hasKey("connectable")) {
             settingsBuilder.setConnectable(options.getBoolean("connectable"));
-        }*/
+        }
+
+        if (options != null && options.hasKey("timeout")) {
+            settingsBuilder.setTimeout(options.getInt("timeout"));
+        }
+
         settingsBuilder.setConnectable(false);
-        settingsBuilder.setTimeout(1000);
+        //settingsBuilder.setTimeout(1000);
         settingsBuilder.setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_HIGH);
-        settingsBuilder.setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY);
+        //settingsBuilder.setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_BALANCED);
 
         return settingsBuilder.build();
     }
