@@ -1,9 +1,11 @@
 #import "BLEAdvertiser.h"
 @import CoreBluetooth;
+@import CoreLocation;
 
 @implementation BLEAdvertiser
 
-#define REGION_ID @"com.privatekit.ibeacon"
+//#define REGION_ID @"com.privatekit.ibeacon"
+#define REGION_ID @""
 
 - (dispatch_queue_t)methodQueue
 {
@@ -26,16 +28,41 @@ RCT_EXPORT_METHOD(broadcast: (NSString *)uid payload:(NSArray *)payload options:
     resolve: (RCTPromiseResolveBlock)resolve
     rejecter:(RCTPromiseRejectBlock)reject){
 
-    RCTLogInfo(@"Broadcast function called %@ at %@", uid, payload);
+    RCTLogInfo(@"Broadcast function called");
     // Beacon Version. 
     //NSUUID *proximityUUID = [[NSUUID alloc] initWithUUIDString:uid];
-    //CLBeaconRegion *beaconRegion = [[CLBeaconRegion alloc] initWithProximityUUID:proximityUUID major:1 minor:1 identifier:REGION_ID];
-    //NSDictionary *advertisingData = [beaconRegion peripheralDataWithMeasuredPower:nil];
+    /*
+    NSArray array = payload;
+
+    Byte bytes = calloc(array.count, sizeof(Byte));
+
+    [array enumerateObjectsUsingBlock:^(NSNumber number, NSUInteger index, BOOL stop){
+
+    bytes[index] = number.integerValue;
+    }];*/
+    unsigned char* bytes = calloc(payload.count, sizeof(unsigned char));
+    for (int i = 0; i < payload.count; i++)
+    {
     
+        NSNumber* p = payload[i];
+        bytes[i] = p.intValue;
+        //bytes[i] = (unsigned char)payload[i];
+    }
+    
+    
+    NSUUID *UUID = [[NSUUID alloc] initWithUUIDBytes:bytes];
+    RCTLogInfo(@"UUID %@", UUID);
+    
+    CLBeaconRegion *beaconRegion = [[CLBeaconRegion alloc] initWithUUID:UUID major:1 minor:1 identifier:@"my"];
+    //NSDictionary *advertisingData = [beaconRegion peripheralDataWithMeasuredPower:nil];
+    NSDictionary *advertisingData = [beaconRegion peripheralDataWithMeasuredPower:nil];
+    /*
     NSDictionary *advertisingData = @{
-        CBAdvertisementDataManufacturerDataKey : payload
+        //CBAdvertisementDataManufacturerDataKey : payload
       //  CBAdvertisementDataServiceUUIDsKey : @[[CBUUID UUIDWithString:uid]]
-    };
+       // CBAdvertisementDataLocalNameKey: payload
+        CBAdvertisementDataServiceUUIDsKey: payload
+    };*/
 
     [peripheralManager startAdvertising:advertisingData];
 
@@ -235,6 +262,14 @@ RCT_EXPORT_METHOD(isActive:
     }
 }
 
+- (void)peripheralManagerDidStartAdvertising:(CBPeripheralManager *)peripheral
+error:(NSError *)error
+{
+
+if (error) {
+NSLog(@"Error advertising: %@", [error localizedDescription]);
+}
+}
 
 @end
   
