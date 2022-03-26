@@ -55,7 +55,7 @@ public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
     private static ScanCallback mScannerCallback;
     private int companyId;
     private Boolean mObservedState;
-    private String adapterPrevName;
+    // private String adapterPrevName;
 
     //Constructor
     public BLEAdvertiserModule(ReactApplicationContext reactContext) {
@@ -72,7 +72,7 @@ public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
 
         if (mBluetoothAdapter != null) {
             mObservedState = mBluetoothAdapter.isEnabled();
-            adapterPrevName = mBluetoothAdapter.getName();
+            // adapterPrevName = mBluetoothAdapter.getName();
         }
 
         this.companyId = 0x0000;
@@ -163,9 +163,9 @@ public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
         
 	Log.w("BLEAdvertiserModule", "Advertisers data:" + arrToString(toByteArray(payload)));
 
-        if (options != null && options.hasKey("beaconName")) {
-            mBluetoothAdapter.setName(options.getString("beaconName"))
-        }
+        // if (options != null && options.hasKey("beaconName")) {
+        //     mBluetoothAdapter.setName(options.getString("beaconName"))
+        // }
 	    
         AdvertiseSettings settings = buildAdvertiseSettings(options);
         AdvertiseData data = buildAdvertiseData(ParcelUuid.fromString(uid), toByteArray(payload), options);
@@ -220,7 +220,7 @@ public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
             return;
         }
 
-        mBluetoothAdapter.setName(adapterPrevName);
+        // mBluetoothAdapter.setName(adapterPrevName);
 
         WritableArray promiseArray=Arguments.createArray();
 
@@ -515,7 +515,7 @@ public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
             super.onStartFailure(errorCode);
             Log.i(TAG, "Advertising failed with code "+ errorCode);
 
-            mBluetoothAdapter.setName(adapterPrevName);
+            // mBluetoothAdapter.setName(adapterPrevName);
 
             if (promise == null) return;
 

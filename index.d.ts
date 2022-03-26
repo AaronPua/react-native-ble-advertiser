@@ -13,6 +13,7 @@ export interface BroadcastOptions {
     includeDeviceName?: boolean;
     includeTxPowerLevel?: boolean;
     connectable?: boolean;
+    beaconName?: string;
 }
 
 export function setCompanyId(companyId: number): void;
