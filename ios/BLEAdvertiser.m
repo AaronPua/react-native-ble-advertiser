@@ -53,16 +53,15 @@ RCT_EXPORT_METHOD(broadcast: (NSString *)uid payload:(NSArray *)payload options:
     NSUUID *UUID = [[NSUUID alloc] initWithUUIDBytes:bytes];
     RCTLogInfo(@"UUID %@", UUID);
     
-    CLBeaconRegion *beaconRegion = [[CLBeaconRegion alloc] initWithUUID:UUID major:1 minor:1 identifier:@"my"];
+    // CLBeaconRegion *beaconRegion = [[CLBeaconRegion alloc] initWithUUID:UUID major:1 minor:1 identifier:@"my"];
     //NSDictionary *advertisingData = [beaconRegion peripheralDataWithMeasuredPower:nil];
-    NSDictionary *advertisingData = [beaconRegion peripheralDataWithMeasuredPower:nil];
-    /*
+    // NSDictionary *advertisingData = [beaconRegion peripheralDataWithMeasuredPower:nil];
+    
     NSDictionary *advertisingData = @{
-        //CBAdvertisementDataManufacturerDataKey : payload
-      //  CBAdvertisementDataServiceUUIDsKey : @[[CBUUID UUIDWithString:uid]]
-       // CBAdvertisementDataLocalNameKey: payload
-        CBAdvertisementDataServiceUUIDsKey: payload
-    };*/
+        CBAdvertisementDataManufacturerDataKey : payload
+        CBAdvertisementDataServiceUUIDsKey : @[[CBUUID UUIDWithString:uid]]
+        CBAdvertisementDataLocalNameKey: payload
+    };
 
     [peripheralManager startAdvertising:advertisingData];
 
