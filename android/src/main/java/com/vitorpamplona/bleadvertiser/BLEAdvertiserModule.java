@@ -55,6 +55,7 @@ public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
     private static ScanCallback mScannerCallback;
     private int companyId;
     private Boolean mObservedState;
+    private String adapterPrevName;
 
     //Constructor
     public BLEAdvertiserModule(ReactApplicationContext reactContext) {
@@ -71,6 +72,7 @@ public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
 
         if (mBluetoothAdapter != null) {
             mObservedState = mBluetoothAdapter.isEnabled();
+            adapterPrevName = mBluetoothAdapter.getName();
         }
 
         this.companyId = 0x0000;
@@ -160,11 +162,16 @@ public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
         }
         
 	Log.w("BLEAdvertiserModule", "Advertisers data:" + arrToString(toByteArray(payload)));
+
+        if (options != null && options.hasKey("beaconName")) {
+            mBluetoothAdapter.setName(options.getString("beaconName"))
+        }
 	    
         AdvertiseSettings settings = buildAdvertiseSettings(options);
         AdvertiseData data = buildAdvertiseData(ParcelUuid.fromString(uid), toByteArray(payload), options);
+        AdvertiseData scanResponse = buildAdvertiseDataScanResponse(options);
 
-        tempAdvertiser.startAdvertising(settings, data, tempCallback);
+        tempAdvertiser.startAdvertising(settings, data, scanResponse, tempCallback);
 
         mAdvertiserList.put(uid, tempAdvertiser);
         mAdvertiserCallbackList.put(uid, tempCallback);
@@ -212,6 +219,8 @@ public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
             promise.reject("Bluetooth disabled");
             return;
         }
+
+        mBluetoothAdapter.setName(adapterPrevName);
 
         WritableArray promiseArray=Arguments.createArray();
 
@@ -460,9 +469,9 @@ public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
             settingsBuilder.setTimeout(options.getInt("timeout"));
         }
 
-        settingsBuilder.setConnectable(false);
+        // settingsBuilder.setConnectable(false);
         //settingsBuilder.setTimeout(1000);
-        settingsBuilder.setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_HIGH);
+        // settingsBuilder.setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_HIGH);
         //settingsBuilder.setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_BALANCED);
 
         return settingsBuilder.build();
@@ -470,16 +479,25 @@ public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
 
     private AdvertiseData buildAdvertiseData(ParcelUuid uuid, byte[] payload, ReadableMap options) {
         AdvertiseData.Builder dataBuilder = new AdvertiseData.Builder();
-
-        if (options != null && options.hasKey("includeDeviceName")) 
-            dataBuilder.setIncludeDeviceName(options.getBoolean("includeDeviceName"));
         
          if (options != null && options.hasKey("includeTxPowerLevel")) 
             dataBuilder.setIncludeTxPowerLevel(options.getBoolean("includeTxPowerLevel"));
         
         dataBuilder.addManufacturerData(companyId, payload);
-        //dataBuilder.addServiceUuid(uuid);
+        dataBuilder.addServiceUuid(uuid);
         return dataBuilder.build();
+    }
+
+    // startAdvertising takes in a 3rd argument called scanResponse. 
+    // Since device names can sometimes be long, it is better to move it
+    // to the scanResponse to circumvent the 31 bit restriction in advertiseData.
+    private AdvertiseData buildAdvertiseDataScanResponse(ReadableMap options) {
+        AdvertiseData.Builder scanResponse = new AdvertiseData.Builder();
+
+        if (options != null && options.hasKey("includeDeviceName")) 
+            scanResponse.setIncludeDeviceName(options.getBoolean("includeDeviceName"));
+
+        return scanResponse.build();    
     }
 
     private class SimpleAdvertiseCallback extends AdvertiseCallback {
@@ -496,6 +514,8 @@ public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
         public void onStartFailure(int errorCode) {
             super.onStartFailure(errorCode);
             Log.i(TAG, "Advertising failed with code "+ errorCode);
+
+            mBluetoothAdapter.setName(adapterPrevName);
 
             if (promise == null) return;
 
