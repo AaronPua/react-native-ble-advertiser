@@ -69,8 +69,6 @@ public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
         if (bluetoothManager != null) {
             mBluetoothAdapter = bluetoothManager.getAdapter();
         }
-        
-        this.adapterPrevName = 'Beacon Test';
 
         if (mBluetoothAdapter != null) {
             mObservedState = mBluetoothAdapter.isEnabled();
@@ -164,9 +162,9 @@ public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
         
 	Log.w("BLEAdvertiserModule", "Advertisers data:" + arrToString(toByteArray(payload)));
 
-        if (options != null && options.hasKey("beaconName")) {
-            mBluetoothAdapter.setName(options.getString("beaconName"))
-        }
+        adapterPrevName = mBluetoothAdapter.getName();
+        if (options != null && options.hasKey("beaconName")) 
+            mBluetoothAdapter.setName(options.getString("beaconName"));
 	    
         AdvertiseSettings settings = buildAdvertiseSettings(options);
         AdvertiseData data = buildAdvertiseData(ParcelUuid.fromString(uid), toByteArray(payload), options);
@@ -220,8 +218,6 @@ public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
             promise.reject("Bluetooth disabled");
             return;
         }
-
-        // mBluetoothAdapter.setName(adapterPrevName);
 
         WritableArray promiseArray=Arguments.createArray();
 
@@ -306,7 +302,6 @@ public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
         if (mScanner != null) {
             mScanner.stopScan(mScannerCallback);
             mScanner = null;
-            mBluetoothAdapter.setName(this.adapterPrevName);
             promise.resolve("Scanner stopped");
         } else {
             promise.resolve("Scanner not started");
