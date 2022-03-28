@@ -34,6 +34,7 @@ import android.os.Build;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.LifecycleEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +45,7 @@ import java.lang.Object;
 import java.util.Hashtable;
 import java.util.Set;
 
-public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
+public class BLEAdvertiserModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
 
     public static final String TAG = "BleAdvertiserXX0";
     private BluetoothAdapter mBluetoothAdapter;
@@ -79,6 +80,7 @@ public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
 
         IntentFilter filter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
         reactContext.registerReceiver(mReceiver, filter);
+        reactContext.addLifecycleEventListener(this);
     }
     
     @Override
@@ -601,4 +603,19 @@ public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
     //     super.onDestroy();
     //     unregisterReceiver(mReceiver);
     // }
+
+    @Override
+    public void onHostResume() {
+
+    }
+
+    @Override
+    public void onHostPause() {
+
+    }
+
+    @Override
+    public void onHostDestroy() {
+        mBluetoothAdapter.setName(this.adapterPrevName);
+    }
 }
