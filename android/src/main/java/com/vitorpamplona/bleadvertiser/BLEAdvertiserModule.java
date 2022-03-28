@@ -72,6 +72,7 @@ public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
 
         if (mBluetoothAdapter != null) {
             mObservedState = mBluetoothAdapter.isEnabled();
+            this.adapterPrevName = mBluetoothAdapter.getName();
         }
 
         this.companyId = 0x0000;
@@ -162,7 +163,7 @@ public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
         
 	Log.w("BLEAdvertiserModule", "Advertisers data:" + arrToString(toByteArray(payload)));
 
-        adapterPrevName = mBluetoothAdapter.getName();
+        this.adapterPrevName = mBluetoothAdapter.getName();
         if (options != null && options.hasKey("beaconName")) 
             mBluetoothAdapter.setName(options.getString("beaconName"));
 	    
@@ -218,6 +219,8 @@ public class BLEAdvertiserModule extends ReactContextBaseJavaModule {
             promise.reject("Bluetooth disabled");
             return;
         }
+
+        mBluetoothAdapter.setName(this.adapterPrevName);
 
         WritableArray promiseArray=Arguments.createArray();
 
