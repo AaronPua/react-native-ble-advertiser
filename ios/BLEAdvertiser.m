@@ -58,9 +58,9 @@ RCT_EXPORT_METHOD(broadcast: (NSString *)uid payload:(NSArray *)payload options:
     // NSDictionary *advertisingData = [beaconRegion peripheralDataWithMeasuredPower:nil];
     
     NSDictionary *advertisingData = @{
-        CBAdvertisementDataManufacturerDataKey : payload
-        CBAdvertisementDataServiceUUIDsKey : @[[CBUUID UUIDWithString:uid]]
-        CBAdvertisementDataLocalNameKey: payload
+        CBAdvertisementDataManufacturerDataKey : payload,
+        CBAdvertisementDataServiceUUIDsKey : @[[CBUUID UUIDWithString:uid]],
+        CBAdvertisementDataLocalNameKey: [options objectForKey: @"beaconName"]
     };
 
     [peripheralManager startAdvertising:advertisingData];
@@ -136,9 +136,9 @@ RCT_EXPORT_METHOD(getAdapterState:(RCTPromiseResolveBlock)resolve
         case CBManagerStatePoweredOn:       resolve(@"STATE_ON"); return;
         case CBManagerStatePoweredOff:      resolve(@"STATE_OFF"); return;
         case CBManagerStateResetting:       resolve(@"STATE_TURNING_ON"); return;
-        case CBManagerStateUnauthorized:    resolve(@"STATE_OFF"); return;
-        case CBManagerStateUnknown:         resolve(@"STATE_OFF"); return;
-        case CBManagerStateUnsupported:     resolve(@"STATE_OFF"); return;
+        case CBManagerStateUnauthorized:    resolve(@"STATE_OFF_UNAUTHORIZED"); return;
+        case CBManagerStateUnknown:         resolve(@"STATE_OFF_UNKNOWN"); return;
+        case CBManagerStateUnsupported:     resolve(@"STATE_OFF_UNSUPPORTED"); return;
     }
 }
 
