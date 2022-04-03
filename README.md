@@ -49,6 +49,8 @@ On your plist file, add the following keys:
 <string>...</string>
 <key>NSBluetoothAlwaysUsageDescription</key>
 <string>...</string>
+<key>NSBluetoothPeripheralUsageDescription</key>
+<string>...</string>
 <key>UIBackgroundModes</key>
 <array>
     <string>bluetooth-central</string>
